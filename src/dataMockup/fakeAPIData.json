@@ -1,0 +1,120 @@
+{
+  "doctores": [
+    {
+      "id": 1,
+      "nombres": "Juan Roberto",
+      "primerApellido": "Flores",
+      "segundoApellido": "Martínez",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 2,
+      "nombres": "Maria",
+      "primerApellido": "Gómez",
+      "segundoApellido": "Farías",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 3,
+      "nombres": "Sofia Margarita",
+      "primerApellido": "Pérez",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 4,
+      "nombres": "Ramón",
+      "primerApellido": "Valdez",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 5,
+      "nombres": "Fernanda",
+      "primerApellido": "Smith",
+      "segundoApellido": "McDonald",
+      "fechaRegistro": ""
+    }
+  ],
+  "pacientes": [
+    {
+      "id": 1,
+      "nombres": "Juan Roberto",
+      "primerApellido": "Flores",
+      "segundoApellido": "Martínez",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 2,
+      "nombres": "Maria",
+      "primerApellido": "Gómez",
+      "segundoApellido": "Farías",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 3,
+      "nombres": "Sofia Margarita",
+      "primerApellido": "Pérez",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 4,
+      "nombres": "Ramón",
+      "primerApellido": "Valdez",
+      "fechaRegistro": ""
+    },
+    {
+      "id": 5,
+      "nombres": "Fernanda",
+      "primerApellido": "Smith",
+      "segundoApellido": "McDonald",
+      "fechaRegistro": ""
+    }
+  ],
+  "solicitudes": [
+    {
+      "key": 1,
+      "id": "B23-001",
+      "pacienteId": 1,
+      "fechaRecepcion": "15/10/2023",
+      "tipoEstudio": 0,
+      "procedencia": "Laboratorio",
+      "estatus": "Terminado"
+    },
+    {
+      "key": 2,
+      "id": "B23-002",
+      "pacienteId": 1,
+      "fechaRecepcion": "15/10/2023",
+      "tipoEstudio": 0,
+      "procedencia": "Laboratorio",
+      "estatus": "Terminado"
+    },
+    {
+      "key": 3,
+      "id": "C23-001",
+      "pacienteId": 1,
+      "fechaRecepcion": "15/10/2023",
+      "tipoEstudio": 0,
+      "procedencia": "Laboratorio",
+      "estatus": "En proceso"
+    },
+    {
+      "key": 4,
+      "id": "B23-003",
+      "pacienteId": 1,
+      "fechaRecepcion": "15/10/2023",
+      "tipoEstudio": 0,
+      "procedencia": "Laboratorio",
+      "estatus": "En proceso"
+    }
+  ],
+  "configUI": {
+    "colorTheme": "#777777"
+  },
+  "users": [
+    {
+      "email": "david.casillas@iea.edu.mx",
+      "password": "$2a$10$TNHn0ECV3Bx86249QKTdeOXD5vc1Q5joecvLq822o/0qMOVpQFzay",
+      "id": 1
+    }
+  ]
+}

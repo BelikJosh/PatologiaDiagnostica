@@ -1,0 +1,40 @@
+html,
+body,
+#root,
+#root > div {
+	height: 100%;
+	margin: 0px;
+}
+
+/* Login page */
+.loginContainer {
+	margin: 30px;
+    padding: 30px;
+	border-radius: 5%;
+	height: 80%;
+}
+.centerImg {
+	width: 60%;
+	height: auto;
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	animation-name: imgAnim;
+    animation-duration: 4s;
+}
+@keyframes imgAnim {
+	0% {
+		opacity: 0%;
+	}
+	100% {
+		opacity: 100%;
+	}
+}
+
+.loginFormContainer {
+    border: 2px solid #d3d3d3;
+
+}
