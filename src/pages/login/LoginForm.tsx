@@ -1,12 +1,9 @@
 // src/components/LoginForm.tsx
 import React, { useState } from 'react';
-import { Button, Form, Input, message, FormProps, Card, Tabs, Typography } from 'antd';
+import { Button, Form, Input, message, FormProps } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../../services/authService';
-import { DebugLogin } from '../../components/DebugLogin';
 
-const { Title } = Typography;
-const { TabPane } = Tabs;
 
 type FieldType = {
   User: string;
@@ -17,7 +14,6 @@ export const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>('login');
   const [form] = Form.useForm();
 
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
@@ -37,12 +33,10 @@ export const LoginForm: React.FC = () => {
         navigate('/dashboard');
       } else {
         messageApi.error(result.error || 'Error en el login');
-        setActiveTab('debug'); // Cambiar a debug si falla
       }
     } catch (error) {
       console.error('Error completo:', error);
       messageApi.error('Error de conexión con la base de datos');
-      setActiveTab('debug');
     } finally {
       setLoading(false);
     }
@@ -54,31 +48,9 @@ export const LoginForm: React.FC = () => {
   };
 
   // Datos de prueba para desarrollo
-  const testCredentials = [
-    { user: 'admin', password: 'admin123' },
-    { user: 'usuario', password: 'usuario123' },
-    { user: 'test', password: 'test123' }
-  ];
+ 
 
-  return (
-    <>
-      {contextHolder}
-      <div style={{ 
-        maxWidth: 800, 
-        margin: '0 auto', 
-        padding: 20,
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <Card style={{ width: '100%', maxWidth: 500 }}>
-          <Title level={2} style={{ textAlign: 'center', marginBottom: 30 }}>
-            🔐 Iniciar Sesión
-          </Title>
-          
-          <Tabs activeKey={activeTab} onChange={setActiveTab}>
-            <TabPane tab="Login" key="login">
+  return (        
               <Form
                 layout="vertical"
                 form={form}
@@ -125,16 +97,7 @@ export const LoginForm: React.FC = () => {
                 </Form.Item>
               </Form>
               
-              {/* Credenciales de prueba para desarrollo */}
               
-            </TabPane>
-            
-            <TabPane tab="Debug" key="debug">
-              <DebugLogin />
-            </TabPane>
-          </Tabs>
-        </Card>
-      </div>
-    </>
+    
   );
 };

@@ -28,11 +28,7 @@ const MenuItems: MenuProps['items'] = [
 				key: 'viewSol',
 				icon: <EyeFilled />,
 			},
-			{
-				label: 'Agregar Solicitud',
-				key: 'addSol',
-				icon: <FileAddFilled />,
-			},
+			
 			{
 				label: 'Ver Solicitudes Anteriores',
 				key: 'verSolAnt',
