@@ -3,7 +3,6 @@ import {
 	DashboardOutlined,
 	DollarOutlined,
 	EyeFilled,
-	FileAddFilled,
 	FolderFilled,
 	TeamOutlined,
 } from '@ant-design/icons';
@@ -14,7 +13,7 @@ import { Icon } from '@iconify/react';
 
 const MenuItems: MenuProps['items'] = [
 	{
-		label: <Link to="">Panel de Control</Link>,
+		label: <Link to="/dashboard">Panel de Control</Link>,
 		key: 'panel',
 		icon: <DashboardOutlined />,
 	},
@@ -30,7 +29,7 @@ const MenuItems: MenuProps['items'] = [
 			},
 			
 			{
-				label: 'Ver Solicitudes Anteriores',
+				label: <Link to="solicitudes-anteriores">Ver Solicitudes Anteriores</Link>,
 				key: 'verSolAnt',
 				icon: <FolderFilled />,
 			},

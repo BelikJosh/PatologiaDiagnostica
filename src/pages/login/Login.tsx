@@ -26,7 +26,7 @@ export const Login = () => {
 							>
 								<img
 									className="centerImg"
-									src="./assets/LogoPatologiaDiagnosticaAgs.png"
+									src="../../../public/assets/Logo.jpg"
 								/>
 							</div>
 						</Col>

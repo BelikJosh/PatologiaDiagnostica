@@ -1,5 +1,5 @@
 // src/services/debugService.ts
-import { dynamoDB } from '../aws-config';
+import { docClient } from '../aws-config';
 import { ScanCommand } from "@aws-sdk/client-dynamodb";
 
 export interface DynamoDBItem {
@@ -37,7 +37,7 @@ export class DebugService {
         Limit: 100
       });
 
-      const result = await dynamoDB.send(command);
+      const result = await docClient.send(command);
       const items = result.Items as DynamoDBItem[] || [];
       
       console.log('📊 Items encontrados:', items.length);
@@ -64,13 +64,13 @@ export class DebugService {
         }
       });
       
-      const result = await dynamoDB.send(command);
+      const result = await docClient.send(command);
       const items = result.Items as DynamoDBItem[] || [];
       
       console.log('✅ Colección usuarios encontrada:', items.length > 0);
       return items;
       
-    } catch (error) {
+    } catch (error) { 
       console.error('❌ Error buscando usuarios:', error);
       throw new Error(`Error buscando usuarios: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
@@ -192,7 +192,7 @@ export class DebugService {
         Limit: 1
       };
       
-      await dynamoDB.scan(params).promise();
+      await docClient.scan(params).promise();
       return true;
       
     } catch (error) {

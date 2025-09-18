@@ -9,10 +9,6 @@ import { ConfigProvider } from 'antd';
 import esES from 'antd/locale/es_ES';
 import { MainTheme } from './Theme/MainTheme';
 
-// Polyfill para global (si es necesario)
-if (typeof window.global === 'undefined') {
-  window.global = window;
-}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -20,8 +16,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ConfigProvider locale={esES}>
         <ColorUIProvider>
           <MainTheme>
-            <MainRoutes />
-          </MainTheme>
+             
+                <MainRoutes />
+             
+            </MainTheme>
         </ColorUIProvider>
       </ConfigProvider>
     </BrowserRouter>

@@ -1,14 +1,9 @@
 // src/components/ProtectedRoute.tsx
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Spin } from 'antd';
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -19,10 +14,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         alignItems: 'center', 
         height: '100vh' 
       }}>
-        <Spin size="large" tip="Verificando autenticación..." />
+        <Spin size="large" />
       </div>
     );
   }
 
-  return user ? <>{children}</> : <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 };

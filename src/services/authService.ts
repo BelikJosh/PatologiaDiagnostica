@@ -1,5 +1,5 @@
 // src/services/authService.ts
-import { dynamoDB } from '../aws-config';
+import { docClient } from '../aws-config';
 import { ScanCommand } from "@aws-sdk/client-dynamodb";
 import { User, LoginResponse } from '../aws-config';
 
@@ -8,42 +8,51 @@ export class AuthService {
     try {
       console.log('🔐 Buscando usuario:', username);
       
-      // 1. Buscar el usuario en DynamoDB con SDK v3
+      // 1. Buscar en TODAS las colecciones que puedan contener usuarios/doctores
       const command = new ScanCommand({
         TableName: 'PatologiaApp',
-        FilterExpression: 'NombreColeccion = :name',
+        FilterExpression: 'contains(NombreColeccion, :userKeyword) OR contains(NombreColeccion, :doctorKeyword)',
         ExpressionAttributeValues: {
-          ':name': { S: 'dbo_Usuarios' }
+          ':userKeyword': { S: 'Usuario' },
+          ':doctorKeyword': { S: 'Doctor' }
         }
       });
 
-      const result = await dynamoDB.send(command);
+      // ALTERNATIVA: Buscar en TODOS los items sin filtro inicial
+      // const command = new ScanCommand({
+      //   TableName: 'PatologiaApp'
+      // });
+
+      const result = await docClient.send(command);
       const items = result.Items || [];
       
       if (items.length === 0) {
         return { success: false, error: 'No se encontraron usuarios' };
       }
 
-      const usuariosCollection = items[0];
-      const records = usuariosCollection.Registros?.L || [];
-      
-      console.log('📊 Usuarios en DB:', records.length);
-      
-      // 2. Buscar usuario por nombre de usuario
-      const userRecord = records.find((record: any) => {
-        const dbUser = record.M?.NombreUsuario?.S;
-        return dbUser === username;
-      });
+      console.log('📊 Items encontrados en DB:', items.length);
 
-      if (!userRecord) {
+      // 2. Buscar usuario en todas las colecciones posibles
+      let userFound = null;
+
+      for (const item of items) {
+        const nombreColeccion = item.NombreColeccion?.S || '';
+        
+        // Buscar en diferentes estructuras de datos
+        userFound = this.findUserInItem(item, username);
+        
+        if (userFound) {
+          console.log('✅ Usuario encontrado en colección:', nombreColeccion);
+          break;
+        }
+      }
+
+      if (!userFound) {
         return { success: false, error: 'Usuario no encontrado' };
       }
 
-      // 3. Para desarrollo - verificación simple
-      const userData = userRecord.M;
-      
-      // SOLUCIÓN TEMPORAL: Permitir login sin verificar contraseña encriptada
-      const user = this.extractUserData(userData, username);
+      // 3. Extraer datos del usuario
+      const user = this.extractUserData(userFound, username);
       return { success: true, user };
 
     } catch (error) {
@@ -53,28 +62,96 @@ export class AuthService {
   }
 
   /**
-   * Extrae datos del usuario desde DynamoDB
+   * Busca usuario en diferentes estructuras de items de DynamoDB
+   */
+  private static findUserInItem(item: any, username: string): any {
+    const nombreColeccion = item.NombreColeccion?.S || '';
+
+    // ESCENARIO 1: Usuarios en array Registros (estructura de colección)
+    if (item.Registros?.L && Array.isArray(item.Registros.L)) {
+      console.log('🔍 Buscando en Registros de:', nombreColeccion);
+      
+      for (const record of item.Registros.L) {
+        if (record.M?.NombreUsuario?.S === username || 
+            record.M?.Email?.S === username || 
+            record.M?.Username?.S === username) {
+          return record.M; // Retorna el usuario encontrado
+        }
+      }
+    }
+
+    // ESCENARIO 2: Usuario directo en el item (estructura individual)
+    if (item.NombreUsuario?.S === username || 
+        item.Email?.S === username || 
+        item.Username?.S === username) {
+      console.log('🔍 Usuario encontrado directamente en item:', nombreColeccion);
+      return item;
+    }
+
+    // ESCENARIO 3: Buscar en otros campos posibles
+    if (item.M?.NombreUsuario?.S === username || 
+        item.M?.Email?.S === username) {
+      console.log('🔍 Usuario encontrado en campo M:', nombreColeccion);
+      return item.M;
+    }
+
+    return null;
+  }
+
+  /**
+   * Extrae datos del usuario desde diferentes estructuras de DynamoDB
    */
   private static extractUserData(userData: any, username: string): User {
+    // Manejar diferentes estructuras de datos
+    const userInfo = userData.M || userData; // Soporta tanto M (map) como datos directos
+
     return {
-      username: userData.NombreUsuario?.S || username,
-      nombre: userData.Nombre?.S || userData.NombreUsuario?.S || username,
-      role: this.getRoleFromPuesto(userData.Puesto?.S),
-      token: this.generateToken(username)
+      username: userInfo.NombreUsuario?.S || 
+               userInfo.Username?.S || 
+               userInfo.Email?.S || 
+               username,
+      nombre: userInfo.Nombre?.S || 
+             userInfo.NombreCompleto?.S || 
+             userInfo.NombreUsuario?.S || 
+             username,
+      email: userInfo.Email?.S || '',
+      role: this.getRoleFromData(userInfo),
+      token: this.generateToken(username),
+      // Campos adicionales que podrían ser útiles
+      id: userInfo.Id?.S || userInfo.ID?.S || '',
+      especialidad: userInfo.Especialidad?.S || userInfo.Puesto?.S || ''
     };
   }
 
   /**
-   * Convierte el puesto a role
+   * Determina el role basado en diferentes campos posibles
    */
-  private static getRoleFromPuesto(puesto: string = ''): string {
+  private static getRoleFromData(userData: any): string {
+    // Verificar diferentes campos que podrían indicar el role
+    const puesto = userData.Puesto?.S || '';
+    const role = userData.Role?.S || userData.Rol?.S || '';
+    const tipoUsuario = userData.TipoUsuario?.S || userData.IdTipoUsuario?.S || '';
+    const especialidad = userData.Especialidad?.S || '';
+
     const puestoLower = puesto.toLowerCase();
-    
-    if (puestoLower.includes('admin')) return 'admin';
-    if (puestoLower.includes('doctor') || puestoLower.includes('patolog')) return 'doctor';
-    if (puestoLower.includes('recepcion')) return 'recepcion';
-    if (puestoLower.includes('tecnic')) return 'tecnico';
-    
+    const roleLower = role.toLowerCase();
+    const especialidadLower = especialidad.toLowerCase();
+
+    // Lógica para determinar el role
+    if (roleLower.includes('admin') || puestoLower.includes('admin') || tipoUsuario === '1') {
+      return 'admin';
+    }
+    if (roleLower.includes('doctor') || puestoLower.includes('doctor') || 
+        especialidadLower.includes('patolog') || tipoUsuario === '2') {
+      return 'doctor';
+    }
+    if (roleLower.includes('recepcion') || puestoLower.includes('recepcion') || tipoUsuario === '3') {
+      return 'recepcion';
+    }
+    if (roleLower.includes('tecnic') || puestoLower.includes('tecnic') || tipoUsuario === '4') {
+      return 'tecnico';
+    }
+
     return 'user';
   }
 
@@ -82,7 +159,7 @@ export class AuthService {
     const tokenData = {
       username,
       timestamp: Date.now(),
-      exp: Date.now() + (8 * 60 * 60 * 1000)
+      exp: Date.now() + (8 * 60 * 60 * 1000) // 8 horas
     };
     return btoa(unescape(encodeURIComponent(JSON.stringify(tokenData))));
   }
@@ -100,6 +177,7 @@ export class AuthService {
   static logout(): void {
     sessionStorage.removeItem('aws_token');
     sessionStorage.removeItem('aws_user');
+    sessionStorage.removeItem('user_role');
   }
 
   static getCurrentUser(): User | null {
@@ -108,6 +186,24 @@ export class AuthService {
       return userData ? JSON.parse(userData) : null;
     } catch {
       return null;
+    }
+  }
+
+  // Método auxiliar para debug
+  static async debugCollections(): Promise<void> {
+    try {
+      const command = new ScanCommand({
+        TableName: 'PatologiaApp'
+      });
+
+      const result = await docClient.send(command);
+      console.log('🔍 Debug - Todas las colecciones:', result.Items?.map(item => ({
+        coleccion: item.NombreColeccion?.S,
+        tieneRegistros: !!item.Registros?.L,
+        numRegistros: item.Registros?.L?.length || 0
+      })));
+    } catch (error) {
+      console.error('Error en debug:', error);
     }
   }
 }

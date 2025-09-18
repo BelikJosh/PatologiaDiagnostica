@@ -1,9 +1,11 @@
 // src/Navigation/NavBar.tsx
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Col, Dropdown, Row, message } from 'antd';
+import { Button, Col, Dropdown, Row, message, Image, Typography, Space } from 'antd';
 import type { MenuProps } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+
+const { Text } = Typography;
 
 export const NavBar = () => {
   const { user, logout } = useAuth();
@@ -17,16 +19,6 @@ export const NavBar = () => {
   };
 
   const items: MenuProps['items'] = [
-    {
-      label: (
-        <div style={{ padding: '8px 12px', minWidth: 150 }}>
-          <div style={{ fontWeight: 'bold' }}>{user?.nombre || 'Usuario'}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>{user?.username}</div>
-          <div style={{ fontSize: '11px', color: '#888' }}>Rol: {user?.role}</div>
-        </div>
-      ),
-      key: 'user-info',
-    },
     {
       type: 'divider',
     },
@@ -62,9 +54,37 @@ export const NavBar = () => {
   return (
     <>
       {contextHolder}
-      <Row justify="end" align="middle" style={{ height: '100%' }}>
-        <Col></Col>
-        <Col style={{ textAlign: 'end' }}>
+      <Row justify="space-between" align="middle" style={{ height: '100%'}}>
+        {/* Parte izquierda: Logo + Nombre */}
+        <Col >
+          <Space>
+            <Image
+              src="/assets/Logo.jpg"
+              alt="Logo Patología Diagnóstica"
+              preview={false}
+              width={40}
+              height={40}
+              style={{
+                borderRadius: '8px',
+                objectFit: 'cover'
+              }}
+              fallback="https://via.placeholder.com/40x40/1890ff/ffffff?text=PD"
+            />
+            <Text strong style={{ fontSize: '16px', whiteSpace: 'nowrap' }}>
+              Patología Diagnóstica de Aguascalientes
+            </Text>
+          </Space>
+        </Col>
+
+        {/* Parte central: Sistema de Control Interno */}
+        <Col flex="auto" style={{ textAlign: 'center' }}>
+          <Text strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>
+            Sistema de Control Interno
+          </Text>
+        </Col>
+
+        {/* Parte derecha: Usuario */}
+        <Col flex="none">
           <Dropdown 
             menu={{ items }} 
             trigger={['click']}

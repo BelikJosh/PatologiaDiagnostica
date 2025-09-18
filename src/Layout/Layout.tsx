@@ -4,7 +4,7 @@ import { NavBar } from '../Navigation/NavBar';
 import { SideBar } from '../Navigation/SideBar';
 import { useState } from 'react';
 import { NavRoutes } from '../routes/NavRoutes';
-import { ProtectedRoute } from '../components/ProtectedRoute'; // Importar el ProtectedRoute
+// REMUEVE el import de ProtectedRoute de aquí
 
 const { Header, Sider, Content } = Layout;
 
@@ -12,32 +12,42 @@ export const LayoutComponent = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <ProtectedRoute> {/* 🔐 Envuelve todo con ProtectedRoute */}
+    // REMUEVE el ProtectedRoute de aquí
+    <Layout>
+      <Header style={{ 
+        padding: '0 24px',
+        background: theme.useToken().token.colorPrimary,
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        <NavBar />
+      </Header>
       <Layout>
-        <Header style={{ background: theme.useToken().token.colorPrimary }}>
-          <NavBar />
-        </Header>
+        <Sider
+          breakpoint="md"
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(value) => setCollapsed(value)}
+          style={{
+            background: '#fff',
+          }}
+        >
+          <SideBar />
+        </Sider>
         <Layout>
-          <Sider
-            breakpoint="md"
-            collapsible
-            collapsed={collapsed}
-            onCollapse={(value) => setCollapsed(value)}
+          <Content
+            style={{
+              padding: '24px',
+              margin: 0,
+              minHeight: 280,
+              background: '#f5f5f5',
+              overflow: 'auto'
+            }}
           >
-            <SideBar />
-          </Sider>
-          <Layout>
-            <Content
-              style={{
-                padding: '20px',
-                overflow: 'scroll',
-              }}
-            >
-              <NavRoutes />
-            </Content>
-          </Layout>
+            <NavRoutes />
+          </Content>
         </Layout>
       </Layout>
-    </ProtectedRoute>
+    </Layout>
   );
 };
