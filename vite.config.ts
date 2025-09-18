@@ -10,7 +10,8 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
-    
+      base: '/PatologiaDiagnostica/', // ← ¡ESTA LÍNEA ES CRUCIAL!
+
     define: {
       global: 'globalThis',
       'process.env': {},
